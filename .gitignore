@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Secrets / local config
+.env
+.streamlit/secrets.toml
+
+# Model weights (never commit)
+models/*
+!models/.gitkeep
+*.pt
+*.onnx
+*.engine
+
+# Generated outputs, uploads, temporary frames
+outputs/*
+!outputs/.gitkeep
+runs/
+
+# Videos
+*.mp4
+*.avi
+*.mov
+*.mkv
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

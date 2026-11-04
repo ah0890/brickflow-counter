@@ -1,0 +1,51 @@
+# BrickFlow application settings.
+# Relative paths are resolved against the project root.
+
+paths:
+  models_dir: models          # Weights selectable in the UI must live here.
+  outputs_dir: outputs        # Annotated videos and CSV reports.
+  temp_dir: outputs/.tmp      # Uploaded videos while a job is running.
+
+model:
+  # Custom-trained YOLO11 brick detector. Not shipped with the project.
+  weights: models/brick_yolo11n.pt
+  confidence: 0.35            # Minimum detection confidence (0-1).
+  iou: 0.50                   # NMS IoU threshold (0-1).
+  imgsz: 640                  # Inference image size (multiple of 32).
+  device: auto                # auto | cpu | cuda | cuda:N
+  class_ids: null             # null = all classes, or a list such as [0].
+
+tracker:
+  config: config/botsort.yaml
+
+counting:
+  # Point on the bounding box used as the object's position.
+  anchor: bottom_center       # bottom_center | center
+  # Counting direction relative to the line drawn from point 1 to point 2.
+  #   forward: object moves to the right-hand side of the 1->2 direction
+  #            (for a line drawn left-to-right, that is top-to-bottom).
+  #   reverse: the opposite movement.
+  #   both:    either movement.
+  direction: forward
+  # Dead zone (pixels) on either side of the line. A track must leave the
+  # zone on the far side before a crossing is registered; suppresses jitter.
+  hysteresis_px: 6
+  # Frames a track must exist before it is eligible to be counted.
+  min_track_frames: 3
+  # Frames after which a missing track's state is discarded (ID reuse safety).
+  track_timeout_frames: 90
+  # Default line, as fractions of frame width/height.
+  line:
+    x1: 0.10
+    y1: 0.55
+    x2: 0.90
+    y2: 0.55
+
+video:
+  allowed_extensions: [".mp4", ".avi", ".mov"]
+  max_file_size_mb: 1024
+  max_duration_s: 3600
+
+output:
+  show_confidence: true
+  transcode_h264: true        # Re-encode for in-browser playback (imageio-ffmpeg).

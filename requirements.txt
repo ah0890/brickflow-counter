@@ -1,0 +1,21 @@
+# BrickFlow runtime dependencies (tested with Python 3.13 on Windows 11).
+#
+# Install PyTorch FIRST for your hardware, then the rest:
+#   CPU only:     pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+#   NVIDIA GPU:   see https://pytorch.org/get-started/locally/ for the matching CUDA wheel
+#   then:         pip install -r requirements.txt
+#
+# Versions below are the ones installed and verified during development.
+
+ultralytics==8.4.202        # YOLO11 + BoT-SORT tracking interface (AGPL-3.0)
+lap==0.5.14                 # Linear assignment solver used by the tracker
+opencv-python==5.0.0.93
+numpy==2.5.4
+pandas==3.1.0
+PyYAML==6.0.3
+streamlit==1.66.1
+streamlit-image-coordinates==0.4.1
+imageio-ffmpeg==0.8.1       # Bundled ffmpeg for browser-playable H.264 output
+
+# Development / testing
+pytest==9.2.0

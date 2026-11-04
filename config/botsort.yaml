@@ -1,0 +1,22 @@
+# BoT-SORT tracker configuration for BrickFlow (Ultralytics tracking interface).
+# Docs: https://docs.ultralytics.com/modes/track
+# Start from these values and tune against real footage.
+
+tracker_type: botsort
+track_high_thresh: 0.25   # First-stage association score threshold.
+track_low_thresh: 0.10    # Second-stage (low score) association threshold.
+new_track_thresh: 0.30    # Minimum score to start a new track; higher = fewer spurious IDs.
+track_buffer: 45          # Frames a lost track is kept alive (helps brief occlusion).
+match_thresh: 0.80        # Association cost threshold.
+fuse_score: True          # Fuse detection score into matching cost.
+
+# Global motion compensation. Fixed cameras can use "none" for speed;
+# handheld footage benefits from sparseOptFlow.
+gmc_method: sparseOptFlow
+
+# Re-identification (appearance) features. Disabled: bricks look nearly
+# identical, so appearance adds compute with little identity benefit.
+proximity_thresh: 0.5
+appearance_thresh: 0.8
+with_reid: False
+model: auto

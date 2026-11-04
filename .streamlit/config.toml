@@ -1,0 +1,20 @@
+[server]
+# Local-only by default: bind to this machine and keep uploads bounded.
+address = "localhost"
+maxUploadSize = 1024
+headless = true
+
+[browser]
+# No usage telemetry is sent to Streamlit.
+gatherUsageStats = false
+
+[client]
+toolbarMode = "minimal"
+
+[theme]
+base = "dark"
+primaryColor = "#22C55E"
+backgroundColor = "#0F172A"
+secondaryBackgroundColor = "#1E293B"
+textColor = "#E2E8F0"
+font = "sans serif"
