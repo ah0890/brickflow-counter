@@ -19,5 +19,11 @@ CPU processing works but is slower.
 ## Configuration error at startup
 The message names the invalid setting (for example `'model.confidence' must be between 0.01 and 1.0`). Correct it in `config/settings.yaml` and reload the page.
 
+## Results say the video "could not be converted for in-browser playback"
+The H.264 conversion with the bundled ffmpeg failed (missing `imageio-ffmpeg`, disk full, or timeout). The original annotated file is still saved in `outputs/<job_id>/` and can be downloaded and played in VLC or another media player. Reinstall with `pip install imageio-ffmpeg`.
+
+## Opening CSV reports in Excel shows values starting with `'`
+Cells that would otherwise start with `=`, `+`, `-` or `@` are prefixed with an apostrophe so a crafted file name cannot run a spreadsheet formula.
+
 ## `py -3.12` fails with "Unable to create process"
 A stale Python 3.12 registration remains after uninstall. Use `py -3.13` or reinstall 3.12.

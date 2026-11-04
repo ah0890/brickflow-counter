@@ -8,13 +8,14 @@ Local-first app that counts bricks in recorded video (truck loading/unloading, c
 
 ## Current milestone
 
-**Milestones 1–4 complete.** Next: **Milestone 5 – annotated video export + CSV reports** (`src/video_export.make_sink_factory`, `src/report_generator.write_job_reports` / `list_recent_jobs` — the UI already imports these lazily and lights up when they exist). User instructed (2026-11-04) to continue through all milestones without waiting for approval.
+**Milestones 1–5 complete.** Next: **Milestone 6 – testing, performance, security review, `pip-audit`, final docs** (docs/TRAINING.md + frame-extraction script for a brick model). User instructed (2026-11-04) to continue through all milestones without waiting for approval.
 
 ## Completed implementation
 
 - **M1** – validated YAML config (`src/config.py`), Detector interface (`src/detection.py`), utilities (`src/utils.py`), Streamlit shell (`app.py`, `ui/theme.py`), telemetry off, localhost-only.
 - **M3** – line geometry (`src/line_crossing.py`) and `CountingEngine` (`src/counting.py`): hysteresis, finite-segment intersection, direction filter, one count per ID, pending confirmation after min age, teleport guard, ID handover, pruning, `CountingStats`. Algorithm + limitations in docs/ARCHITECTURE.md.
 - **M4** – four-step Streamlit UI (`ui/pages/home|configure|process|results.py`), `ui/state.py` (session state, cached resources), `src/job.py` (`ProcessingJob` background thread + `JobSnapshot`, cancel, `sink_factory`/`finalizer` hooks). Click-to-place line via `streamlit-image-coordinates`. Temp uploads in `outputs/.tmp` deleted on replacement and after `temp_max_age_hours`.
+- **M5** – `src/video_export.py` (`make_sink_factory`: mp4v writer → H.264 via imageio-ffmpeg, raw kept on failure), `src/report_generator.py` (`write_job_reports`, `list_recent_jobs`, `csv_safe`). Outputs in `outputs/<job_id>/`. `JobSnapshot.counting_stats`.
 - **M2** – video validation/probing/reading (`src/video_io.py`), `Track` records (`src/tracking.py`), overlays (`src/annotator.py`), frame pipeline with counter/sink hooks, cancel and failure handling (`src/video_processor.py`). `Detector.track()` returns `list[Track]`.
 
 ## Architecture
@@ -39,6 +40,8 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md). Core `src/` is framework-indep
 | `src/job.py` | `ProcessingJob`, `JobSpec`, `JobSnapshot`, `JobStatus` |
 | `ui/state.py`, `ui/pages/*.py` | Streamlit session state and the four screens |
 | `scripts/ui_screenshots.py` | Playwright (installed Edge) UI walk-through + screenshots |
+| `src/video_export.py` | Annotated video writer + H.264 transcode (`make_sink_factory`) |
+| `src/report_generator.py` | CSV reports, `job.json`, recent jobs |
 | `tests/conftest.py` | Synthetic video writer + `FakeDetector` |
 
 ## Model and tracker configuration
@@ -57,6 +60,8 @@ User has no brick weights and only one video. Options presented: (a) open-vocabu
 `samples/Real_video.mp4` (gitignored, user-supplied): 716×1274 portrait, 30 fps, 909 frames (30.3 s), H.264, 9.5 MB. Handheld/moving camera, several edited scenes (truck unloading 0–5 s and 23–30 s, stacks/loose pile ~8–20 s, wheelbarrows ~15 s), bricks carried in stacks of ~8–10, many static stacked bricks, burned-in advertising text with a third-party phone number in the lower third. **Not suitable for a meaningful count** (camera motion makes static bricks cross a screen-fixed line; scene cuts break tracks). User chose to proceed with it anyway: use for pipeline demonstration and training-data extraction; do not present its count as an accurate result. Get permission before publishing the footage.
 
 ## Tests actually performed
+
+- M5: `pytest` **180 passed**. Browser run on full sample (generic model, all classes, forward): 909 frames, 176 s (5.2 fps avg), count 3 (same as M4, deterministic), 42 distinct IDs, 9 handovers, 4 repeats blocked; H.264 High yuv420p 716×1274 output (15.3 MB) plays in the results page; CSVs verified. A stale-element glitch on Results was seen once in a screenshot and not reproduced in 3 further runs (likely mid-render capture); fragment guard + stricter screenshot wait added.
 
 - M4: `pytest` **162 passed**. Full browser walk-through (headless Edge via `scripts/ui_screenshots.py --video Real_video.mp4 --process`): select sample → configure → process (6.5 fps CPU, live preview/count/ETA updating) → results (count 3, generic-model warning shown, "no output files" as expected before M5).
 
@@ -78,7 +83,7 @@ User has no brick weights and only one video. Options presented: (a) open-vocabu
 
 - Brick model: user did not choose; proceeding without one. Provide frame-extraction script + training guide (docs/TRAINING.md) so a model can be trained later.
 - Scene-cut detection was evaluated on the sample (histogram correlation and grey-level difference): only 1 of ~4 cuts separable from handheld shake → not implemented; teleport guard used instead.
-- M5: export (`frame_sink` + imageio-ffmpeg H.264) + CSV. M6: testing, perf, security review, `pip-audit`.
+- M6: testing, perf, security review, `pip-audit`.
 
 ## Commands
 
@@ -91,5 +96,5 @@ streamlit run app.py
 ## Git
 
 - Branch `main`, remote `origin` = github.com/ah0890/brickflow-counter. Author identity: user's configured git identity (do not modify).
-- M1 `6ccb513`, M2 `4cdd0c9`, M3 `44fbc02` (pushed). M4 onward: see `git log`.
+- M1 `6ccb513`, M2 `4cdd0c9`, M3 `44fbc02`, M4 `e03a38b` (pushed). M5 onward: see `git log`.
 - Policy: commits under the user's identity only; no AI attribution in commits, PRs or repository files.

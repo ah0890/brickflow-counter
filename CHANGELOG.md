@@ -2,6 +2,20 @@
 
 All notable changes to BrickFlow are recorded here, newest first.
 
+## [0.5.0] – 2026-11-04 – Milestone 5: Exports and reports
+
+### Added
+
+- `src/video_export.py`: annotated video writer plugged into the pipeline's frame sink, written under a temporary name and renamed when complete; H.264 (yuv420p, faststart, even dimensions) conversion with the bundled ffmpeg for in-browser playback; the original file is kept if conversion fails.
+- `src/report_generator.py`: summary CSV (video, model, thresholds, line, direction, status, count, timing, counting diagnostics) and events CSV (one row per counted crossing, 1-based frames, timestamps); spreadsheet formula-injection protection; `job.json` metadata and recent-jobs listing.
+- Results screen plays the annotated video and offers video/CSV downloads; Home lists recent jobs.
+- Cancelled and failed jobs keep their partial video and reports.
+- Counting diagnostics exposed in the job snapshot. 18 new tests (180 total).
+
+### Fixed
+
+- Process page's auto-refresh no longer draws when another page is active.
+
 ## [0.4.0] – 2026-11-04 – Milestone 4: Streamlit interface
 
 ### Added

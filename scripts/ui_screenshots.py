@@ -19,7 +19,9 @@ def wait_ready(page: Page, timeout: float = 30) -> None:
     page.wait_for_selector('[data-testid="stSidebar"]', timeout=timeout * 1000)
     end = time.time() + timeout
     while time.time() < end:  # wait until Streamlit stops reporting "running"
-        if page.locator('[data-testid="stStatusWidget"]').count() == 0:
+        running = page.locator('[data-testid="stStatusWidget"]').count()
+        stale = page.locator('[data-stale="true"]').count()  # elements left from the previous run
+        if not running and not stale:
             break
         time.sleep(0.3)
     time.sleep(1.0)

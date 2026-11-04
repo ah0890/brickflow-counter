@@ -20,9 +20,8 @@ src/                    Framework-independent core
   line_crossing.py      Pure geometry: side-of-line, segment intersection, hysteresis
   counting.py           CountingEngine (implements FrameCounter): per-track state, direction, dedup, events
   job.py                ProcessingJob: background thread, lock-protected JobSnapshot, cancel, sink/finalizer hooks
-  (planned)
-  video_export.py       Video writer + H.264 transcode (plugs into frame_sink)
-  report_generator.py   Summary and event CSVs
+  video_export.py       OpenCV mp4v writer (frame_sink) → H.264 transcode via bundled ffmpeg
+  report_generator.py   Summary/event CSVs (formula-injection safe), job.json, recent-jobs list
 ```
 
 Per-frame data flow:
@@ -38,6 +37,10 @@ iter_frames ─► Detector.track(frame) ─► list[Track] ─► FrameCounter.
 ### UI ↔ processing
 
 The Configure page builds a `JobSpec` and starts a `ProcessingJob` (daemon thread). The worker writes progress into a `JobSnapshot` under a lock; the Process page runs an `st.fragment(run_every=0.5s)` that only reads `job.snapshot()` (count, events, FPS, a downscaled RGB preview throttled to ~7 Hz). The worker never touches Streamlit. One job per browser session; Start is disabled while a job runs; Cancel sets an event checked between frames, and partial results are kept.
+
+### Outputs
+
+`outputs/<job_id>/` holds `<job_id>_annotated.mp4` (H.264, yuv420p, faststart), `<job_id>_summary.csv`, `<job_id>_events.csv` and `job.json`. Files are written under a `.partial` name and renamed when complete. If the H.264 conversion fails, the original mp4v file (`<job_id>_annotated_raw.mp4`) is kept and offered for download instead. Cancelled and failed jobs still write their partial video and reports, with `status` recorded. CSV frame numbers are 1-based; CSV cells starting with `= + - @` are prefixed with `'`.
 
 `process_video` never raises for per-frame failures: detector errors, writer errors and truncated files end the run with `status="failed"` (or a warning) and keep the partial results.
 

@@ -29,6 +29,8 @@ def render(cfg: AppConfig) -> None:
 
 @st.fragment(run_every=REFRESH_S)
 def _live() -> None:
+    if st.session_state.get("page") != "Process":
+        return  # a timer-triggered run arriving after navigation must not draw stale widgets
     job: ProcessingJob = st.session_state.job
     snap = job.snapshot()
     if snap.status.terminal:

@@ -9,7 +9,7 @@ from __future__ import annotations
 import threading
 import time
 from collections.abc import Callable
-from dataclasses import dataclass, field, replace
+from dataclasses import asdict, dataclass, field, replace
 from enum import Enum
 from pathlib import Path
 from typing import Any
@@ -71,6 +71,7 @@ class JobSnapshot:
     error: str | None = None
     warnings: list[str] = field(default_factory=list)
     outputs: dict[str, Path] = field(default_factory=dict)
+    counting_stats: dict[str, int] = field(default_factory=dict)  # rejection diagnostics
     started_at: float | None = None
     finished_at: float | None = None
 
@@ -126,7 +127,8 @@ class ProcessingJob:
     def snapshot(self) -> JobSnapshot:
         with self._lock:
             return replace(self._snap, events=list(self._snap.events),
-                           warnings=list(self._snap.warnings), outputs=dict(self._snap.outputs))
+                           warnings=list(self._snap.warnings), outputs=dict(self._snap.outputs),
+                           counting_stats=dict(self._snap.counting_stats))
 
     # -- worker ----------------------------------------------------------- #
 
@@ -169,7 +171,7 @@ class ProcessingJob:
                 should_stop=self._cancel.is_set,
             )
             self._set(result=result, events=list(counter.events), count=counter.total,
-                      warnings=list(result.warnings))
+                      warnings=list(result.warnings), counting_stats=asdict(counter.stats))
 
             outputs: dict[str, Path] = {}
             if close_sink is not None:
