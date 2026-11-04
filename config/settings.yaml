@@ -5,6 +5,8 @@ paths:
   models_dir: models          # Weights selectable in the UI must live here.
   outputs_dir: outputs        # Annotated videos and CSV reports.
   temp_dir: outputs/.tmp      # Uploaded videos while a job is running.
+  samples_dir: samples        # Local videos offered for selection in the UI.
+  temp_max_age_hours: 24      # Older temporary uploads are deleted at startup.
 
 model:
   # Custom-trained YOLO11 brick detector. Not shipped with the project.

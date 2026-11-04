@@ -47,6 +47,8 @@ class PathsConfig:
     models_dir: Path
     outputs_dir: Path
     temp_dir: Path
+    samples_dir: Path
+    temp_max_age_hours: float
 
 
 @dataclass(frozen=True)
@@ -173,6 +175,8 @@ def parse_config(raw: dict[str, Any], root: Path = PROJECT_ROOT) -> AppConfig:
         models_dir=_path(p, "models_dir", "paths", root),
         outputs_dir=_path(p, "outputs_dir", "paths", root),
         temp_dir=_path(p, "temp_dir", "paths", root),
+        samples_dir=_path(p, "samples_dir", "paths", root),
+        temp_max_age_hours=_number(p, "temp_max_age_hours", "paths", 0, 10_000),
     )
 
     m = _section(raw, "model")
@@ -251,5 +255,5 @@ def load_config(path: Path | str | None = None) -> AppConfig:
 
 def ensure_directories(cfg: AppConfig) -> None:
     """Create runtime directories if they do not exist."""
-    for d in (cfg.paths.models_dir, cfg.paths.outputs_dir, cfg.paths.temp_dir):
+    for d in (cfg.paths.models_dir, cfg.paths.outputs_dir, cfg.paths.temp_dir, cfg.paths.samples_dir):
         d.mkdir(parents=True, exist_ok=True)

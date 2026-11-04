@@ -8,12 +8,13 @@ Local-first app that counts bricks in recorded video (truck loading/unloading, c
 
 ## Current milestone
 
-**Milestones 1–3 complete.** Next: **Milestone 4 – Streamlit interface.** User instructed (2026-11-04) to continue through all milestones without waiting for approval.
+**Milestones 1–4 complete.** Next: **Milestone 5 – annotated video export + CSV reports** (`src/video_export.make_sink_factory`, `src/report_generator.write_job_reports` / `list_recent_jobs` — the UI already imports these lazily and lights up when they exist). User instructed (2026-11-04) to continue through all milestones without waiting for approval.
 
 ## Completed implementation
 
 - **M1** – validated YAML config (`src/config.py`), Detector interface (`src/detection.py`), utilities (`src/utils.py`), Streamlit shell (`app.py`, `ui/theme.py`), telemetry off, localhost-only.
 - **M3** – line geometry (`src/line_crossing.py`) and `CountingEngine` (`src/counting.py`): hysteresis, finite-segment intersection, direction filter, one count per ID, pending confirmation after min age, teleport guard, ID handover, pruning, `CountingStats`. Algorithm + limitations in docs/ARCHITECTURE.md.
+- **M4** – four-step Streamlit UI (`ui/pages/home|configure|process|results.py`), `ui/state.py` (session state, cached resources), `src/job.py` (`ProcessingJob` background thread + `JobSnapshot`, cancel, `sink_factory`/`finalizer` hooks). Click-to-place line via `streamlit-image-coordinates`. Temp uploads in `outputs/.tmp` deleted on replacement and after `temp_max_age_hours`.
 - **M2** – video validation/probing/reading (`src/video_io.py`), `Track` records (`src/tracking.py`), overlays (`src/annotator.py`), frame pipeline with counter/sink hooks, cancel and failure handling (`src/video_processor.py`). `Detector.track()` returns `list[Track]`.
 
 ## Architecture
@@ -35,6 +36,9 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md). Core `src/` is framework-indep
 | `config/botsort.yaml` | Tracker parameters |
 | `src/line_crossing.py` | `Line`, `segments_intersect`, `intersection_point`, direction helpers |
 | `src/counting.py` | `CountingEngine`, `CountingParams`, `CountEvent`, `build_counter` |
+| `src/job.py` | `ProcessingJob`, `JobSpec`, `JobSnapshot`, `JobStatus` |
+| `ui/state.py`, `ui/pages/*.py` | Streamlit session state and the four screens |
+| `scripts/ui_screenshots.py` | Playwright (installed Edge) UI walk-through + screenshots |
 | `tests/conftest.py` | Synthetic video writer + `FakeDetector` |
 
 ## Model and tracker configuration
@@ -54,6 +58,8 @@ User has no brick weights and only one video. Options presented: (a) open-vocabu
 
 ## Tests actually performed
 
+- M4: `pytest` **162 passed**. Full browser walk-through (headless Edge via `scripts/ui_screenshots.py --video Real_video.mp4 --process`): select sample → configure → process (6.5 fps CPU, live preview/count/ETA updating) → results (count 3, generic-model warning shown, "no output files" as expected before M5).
+
 - `pytest`: **148 passed** (M3 added 67 geometry/counting tests covering all 10 synthetic scenarios; scenario 10 = video validation tests).
 - Real counting run (generic model tracking people, direction both, CPU): 909 frames, 5.9 fps (slower than the 9.8 fps M2 run; machine load varies), 3 counts, 5 repeat crossings blocked (already counted), 4 handovers, 0 jumps. One count was a stationary person swept across the line by camera panning — confirms the camera-motion limitation. Mechanics check only, not brick counting.
 - Earlier: `pytest` **81 passed** at M2 (config, utils/path safety, model-load errors, video validation incl. corrupt/renamed/truncated, track conversion, pipeline mechanics with fake detector, headless Streamlit smoke tests, 3 real-model integration tests that skip if weights/sample absent).
@@ -65,14 +71,14 @@ User has no brick weights and only one video. Options presented: (a) open-vocabu
 ## Known bugs / limitations
 
 - No brick model → no brick detection yet.
-- Info bar (top-right) can overlap labels of boxes touching the top edge — revisit in M4 UI polish.
+- Info bar (top-right) can overlap labels of boxes touching the top edge (cosmetic).
 - Generic model missed some partially occluded workers (detector limitation, expected).
 
 ## Pending tasks
 
 - Brick model: user did not choose; proceeding without one. Provide frame-extraction script + training guide (docs/TRAINING.md) so a model can be trained later.
 - Scene-cut detection was evaluated on the sample (histogram correlation and grey-level difference): only 1 of ~4 cuts separable from handheld shake → not implemented; teleport guard used instead.
-- M4: UI upload/preview/line config/live dashboard (background thread + `st.fragment(run_every)`). M5: export (`frame_sink` + imageio-ffmpeg H.264) + CSV. M6: testing, perf, security review, `pip-audit`.
+- M5: export (`frame_sink` + imageio-ffmpeg H.264) + CSV. M6: testing, perf, security review, `pip-audit`.
 
 ## Commands
 
@@ -85,5 +91,5 @@ streamlit run app.py
 ## Git
 
 - Branch `main`, remote `origin` = github.com/ah0890/brickflow-counter. Author identity: user's configured git identity (do not modify).
-- M1 `6ccb513`, M2 `4cdd0c9` (both pushed). M3 onward: see `git log`.
+- M1 `6ccb513`, M2 `4cdd0c9`, M3 `44fbc02` (pushed). M4 onward: see `git log`.
 - Policy: commits under the user's identity only; no AI attribution in commits, PRs or repository files.

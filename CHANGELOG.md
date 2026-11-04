@@ -2,6 +2,17 @@
 
 All notable changes to BrickFlow are recorded here, newest first.
 
+## [0.4.0] – 2026-11-04 – Milestone 4: Streamlit interface
+
+### Added
+
+- Four-step UI (`ui/pages/`): Home (system status, upload or local sample selection with validation), Configure (click-to-place counting line on a chosen frame, fine-tune sliders, presets, model/class/threshold/direction settings, input validation), Process (live annotated preview, large count, progress, FPS, time left, cancel), Results (final count, summary, counting-event table).
+- `src/job.py`: `ProcessingJob` running the pipeline in a background thread with lock-protected snapshots, cancellation, and hooks for video export and reports.
+- `ui/state.py`: session state and cached resources; temporary uploads are deleted when replaced and stale ones cleaned at startup (`paths.temp_max_age_hours`).
+- Settings `paths.samples_dir`, `paths.temp_max_age_hours`.
+- Generic COCO models are flagged in the UI and on results as a pipeline demonstration, not a brick count.
+- `scripts/ui_screenshots.py` for browser-driven UI checks. 162 tests total.
+
 ## [0.3.0] – 2026-11-04 – Milestone 3: Virtual line and counting engine
 
 ### Added

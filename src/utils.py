@@ -65,6 +65,45 @@ def display_path(path: Path) -> str:
         return Path(path).name
 
 
+def cleanup_old_files(directory: Path, max_age_hours: float) -> int:
+    """Delete regular files in ``directory`` (non-recursive) older than the age limit.
+
+    Returns the number of files removed. Symlinks and subdirectories are left alone.
+    """
+    import time
+
+    directory = Path(directory)
+    if not directory.is_dir():
+        return 0
+    cutoff = time.time() - max_age_hours * 3600
+    removed = 0
+    for f in directory.iterdir():
+        try:
+            if f.is_file() and not f.is_symlink() and f.stat().st_mtime < cutoff:
+                f.unlink()
+                removed += 1
+        except OSError:
+            continue  # in use or already gone
+    return removed
+
+
+def delete_if_within(base: Path, path: Path | None) -> bool:
+    """Delete ``path`` only if it is a file inside ``base``. Returns True if deleted."""
+    if path is None:
+        return False
+    try:
+        target = resolve_within(base, path)
+    except UnsafePathError:
+        return False
+    try:
+        if target.is_file():
+            target.unlink()
+            return True
+    except OSError:
+        pass
+    return False
+
+
 @dataclass(frozen=True)
 class DeviceInfo:
     device: str           # Value to pass to Ultralytics ("cpu", "cuda:0", ...)

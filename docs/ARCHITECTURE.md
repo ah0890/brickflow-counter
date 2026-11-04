@@ -4,6 +4,9 @@
 
 ```text
 app.py + ui/            Streamlit presentation only (no counting logic)
+  ui/state.py           Session state, cached config/device/model info/frames, navigation
+  ui/pages/             home (status + video choice) · configure (line, model, direction)
+                        · process (live fragment polling the job) · results
         │
         ▼
 src/                    Framework-independent core
@@ -13,10 +16,11 @@ src/                    Framework-independent core
   video_io.py           Video validation / probing / frame reading
   annotator.py          Boxes, IDs, line + direction arrow, count panel, frame info
   video_processor.py    Frame loop: reset → track → counter hook → annotate → sink; callbacks, cancel
-  utils.py              Paths, safe filenames, sandboxing, device selection
-  (planned)
+  utils.py              Paths, safe filenames, sandboxing, device selection, temp cleanup
   line_crossing.py      Pure geometry: side-of-line, segment intersection, hysteresis
   counting.py           CountingEngine (implements FrameCounter): per-track state, direction, dedup, events
+  job.py                ProcessingJob: background thread, lock-protected JobSnapshot, cancel, sink/finalizer hooks
+  (planned)
   video_export.py       Video writer + H.264 transcode (plugs into frame_sink)
   report_generator.py   Summary and event CSVs
 ```
@@ -30,6 +34,10 @@ iter_frames ─► Detector.track(frame) ─► list[Track] ─► FrameCounter.
                                                           │
                                          on_frame (UI)  ◄─┴─►  frame_sink (writer)
 ```
+
+### UI ↔ processing
+
+The Configure page builds a `JobSpec` and starts a `ProcessingJob` (daemon thread). The worker writes progress into a `JobSnapshot` under a lock; the Process page runs an `st.fragment(run_every=0.5s)` that only reads `job.snapshot()` (count, events, FPS, a downscaled RGB preview throttled to ~7 Hz). The worker never touches Streamlit. One job per browser session; Start is disabled while a job runs; Cancel sets an event checked between frames, and partial results are kept.
 
 `process_video` never raises for per-frame failures: detector errors, writer errors and truncated files end the run with `status="failed"` (or a warning) and keep the partial results.
 

@@ -2,7 +2,7 @@
 
 Automated brick counting system using YOLO11 object detection, BoT-SORT multi-object tracking, and virtual line-crossing detection to count bricks in videos, generate annotated footage, and maintain digital counting records.
 
-> **Status:** Milestones 1–3 of 6 complete (foundation; detection + tracking pipeline; counting engine). Full UI and exports are in progress — see [CHANGELOG.md](CHANGELOG.md) and [context.md](context.md).
+> **Status:** Milestones 1–4 of 6 complete (foundation; detection + tracking pipeline; counting engine; Streamlit interface). Exports and final hardening are in progress — see [CHANGELOG.md](CHANGELOG.md) and [context.md](context.md).
 
 ## Why
 
@@ -26,7 +26,8 @@ Manual brick counting during truck loading, unloading and conveyor operations is
 | Video validation (type, size, signature, decodability, duration) | Done (M2) |
 | YOLO11 + BoT-SORT frame pipeline with boxes, IDs, line and count overlay | Done (M2) |
 | Trajectory-based line-crossing counting engine (direction filter, jitter band, duplicate/ID-switch safeguards) | Done (M3) |
-| Video upload, line placement, live counting dashboard | Planned (M4) |
+| Video upload or local selection, click-to-place counting line, model/threshold/direction settings | Done (M4) |
+| Live processing dashboard (annotated preview, count, progress, FPS, ETA, cancel) and results screen | Done (M4) |
 | Annotated video export and CSV reports | Planned (M5) |
 
 ## Technology stack
@@ -67,6 +68,13 @@ streamlit run app.py
 ```
 
 Opens at `http://localhost:8501`. The server binds to `localhost` only and Streamlit usage statistics are disabled.
+
+## Using the app
+
+1. **Choose video** – upload a file, or pick one from `samples/`. The video is validated before use.
+2. **Configure** – click two points on a frame to place the counting line (the arrow shows the counted direction), pick the model, classes, thresholds and direction.
+3. **Process** – watch the annotated preview, live count, progress and speed; cancel at any time (partial results are kept).
+4. **Results** – final count, processing summary and the table of counting events.
 
 ## Tests
 
