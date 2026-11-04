@@ -2,24 +2,36 @@
 
 ## Layers
 
-```
+```text
 app.py + ui/            Streamlit presentation only (no counting logic)
         │
         ▼
 src/                    Framework-independent core
   config.py             YAML → validated, typed AppConfig
-  detection.py          Detector interface + UltralyticsDetector (YOLO11, BoT-SORT via model.track)
+  detection.py          Detector protocol + UltralyticsDetector (YOLO11, BoT-SORT via model.track) → list[Track]
+  tracking.py           Plain Track records; conversion from Ultralytics results (untracked boxes dropped)
+  video_io.py           Video validation / probing / frame reading
+  annotator.py          Boxes, IDs, line + direction arrow, count panel, frame info
+  video_processor.py    Frame loop: reset → track → counter hook → annotate → sink; callbacks, cancel
   utils.py              Paths, safe filenames, sandboxing, device selection
   (planned)
-  tracking.py           Convert tracker results → plain Track records
   line_crossing.py      Pure geometry: side-of-line, segment intersection, hysteresis
-  counting.py           CountingEngine: per-track state, direction filter, dedup, events
-  video_io.py           Video validation / probing / frame reading
-  annotator.py          Boxes, IDs, line and count overlay
-  video_export.py       Video writer + H.264 transcode
-  video_processor.py    Background pipeline runner with thread-safe progress state
+  counting.py           CountingEngine (implements FrameCounter): per-track state, direction, dedup, events
+  video_export.py       Video writer + H.264 transcode (plugs into frame_sink)
   report_generator.py   Summary and event CSVs
 ```
+
+Per-frame data flow:
+
+```text
+iter_frames ─► Detector.track(frame) ─► list[Track] ─► FrameCounter.update ─► events
+                                             │                                   │
+                                             └──────► annotator ◄────────────────┘
+                                                          │
+                                         on_frame (UI)  ◄─┴─►  frame_sink (writer)
+```
+
+`process_video` never raises for per-frame failures: detector errors, writer errors and truncated files end the run with `status="failed"` (or a warning) and keep the partial results.
 
 Dependency rule: `counting.py` and `line_crossing.py` depend only on the standard library and NumPy, so the counting logic is tested with synthetic trajectories and is independent of the detector, tracker and UI.
 

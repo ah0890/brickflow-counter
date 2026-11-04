@@ -2,7 +2,7 @@
 
 Automated brick counting system using YOLO11 object detection, BoT-SORT multi-object tracking, and virtual line-crossing detection to count bricks in videos, generate annotated footage, and maintain digital counting records.
 
-> **Status:** Milestone 1 of 6 (foundation) complete. Detection/tracking pipeline, counting engine, full UI and exports are in progress — see [CHANGELOG.md](CHANGELOG.md) and [context.md](context.md).
+> **Status:** Milestones 1–2 of 6 complete (foundation; detection + tracking pipeline). Counting engine, full UI and exports are in progress — see [CHANGELOG.md](CHANGELOG.md) and [context.md](context.md).
 
 ## Why
 
@@ -23,7 +23,8 @@ Manual brick counting during truck loading, unloading and conveyor operations is
 | Model-loading interface with clear errors for missing/invalid weights | Done (M1) |
 | CPU processing, GPU auto-selection with verified CPU fallback | Done (M1) |
 | Streamlit shell with system status | Done (M1) |
-| YOLO11 + BoT-SORT video pipeline | Planned (M2) |
+| Video validation (type, size, signature, decodability, duration) | Done (M2) |
+| YOLO11 + BoT-SORT frame pipeline with boxes, IDs, line and count overlay | Done (M2) |
 | Trajectory-based line-crossing counting engine | Planned (M3) |
 | Video upload, line placement, live counting dashboard | Planned (M4) |
 | Annotated video export and CSV reports | Planned (M5) |

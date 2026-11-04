@@ -20,6 +20,7 @@ from typing import Any, Protocol, runtime_checkable
 os.environ.setdefault("YOLO_OFFLINE", "1")
 
 from src.config import ModelConfig  # noqa: E402
+from src.tracking import Track, tracks_from_ultralytics  # noqa: E402
 from src.utils import DeviceInfo, display_path, select_device  # noqa: E402
 
 SUPPORTED_WEIGHT_SUFFIXES = (".pt", ".onnx")
@@ -78,7 +79,7 @@ class Detector(Protocol):
 
     info: ModelInfo
 
-    def track(self, frame: Any, tracker_config: Path) -> Any:
+    def track(self, frame: Any, tracker_config: Path) -> list[Track]:
         """Run detection + tracking on one BGR frame (persisting tracker state)."""
         ...
 
@@ -133,7 +134,7 @@ class UltralyticsDetector:
             looks_generic_coco=len(names) >= 80 and _COCO_MARKERS <= lowered,
         )
 
-    def track(self, frame: Any, tracker_config: Path) -> Any:
+    def track(self, frame: Any, tracker_config: Path) -> list[Track]:
         results = self._model.track(
             frame,
             persist=True,
@@ -145,9 +146,10 @@ class UltralyticsDetector:
             classes=list(self.cfg.class_ids) if self.cfg.class_ids is not None else None,
             verbose=False,
         )
-        return results[0]
+        return tracks_from_ultralytics(results[0])
 
     def reset(self) -> None:
+        """Clear tracker state and restart IDs at 1 (call before each new video)."""
         predictor = getattr(self._model, "predictor", None)
         if predictor is not None and getattr(predictor, "trackers", None):
             for tracker in predictor.trackers:
