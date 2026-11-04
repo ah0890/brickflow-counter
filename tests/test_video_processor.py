@@ -82,6 +82,21 @@ def test_truncated_video_warns(make_video, tmp_path, fake_detector_cls):
     assert any("truncated" in w for w in res.warnings)
 
 
+def test_end_to_end_with_counting_engine(video, fake_detector_cls):
+    from src.counting import CountingEngine, CountingParams
+    from src.line_crossing import Line
+
+    counter = CountingEngine(Line((0, 60), (159, 60)), CountingParams(direction="forward"))
+    counts = []
+    res = process_video(video, fake_detector_cls(30), TRACKER, OPTS, counter=counter,
+                        on_frame=lambda u: counts.append(u.count))
+    assert res.status == "completed"
+    assert res.count == 1 and len(res.events) == 1
+    assert res.events[0].track_id == 1 and res.events[0].direction == "forward"
+    # Live count is monotonic and equals the number of events registered so far.
+    assert counts == sorted(counts) and counts[0] == 0 and counts[-1] == 1
+
+
 def test_counter_hook_receives_tracks(video, fake_detector_cls):
     class SpyCounter:
         def __init__(self):

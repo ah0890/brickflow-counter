@@ -2,7 +2,7 @@
 
 Automated brick counting system using YOLO11 object detection, BoT-SORT multi-object tracking, and virtual line-crossing detection to count bricks in videos, generate annotated footage, and maintain digital counting records.
 
-> **Status:** Milestones 1–2 of 6 complete (foundation; detection + tracking pipeline). Counting engine, full UI and exports are in progress — see [CHANGELOG.md](CHANGELOG.md) and [context.md](context.md).
+> **Status:** Milestones 1–3 of 6 complete (foundation; detection + tracking pipeline; counting engine). Full UI and exports are in progress — see [CHANGELOG.md](CHANGELOG.md) and [context.md](context.md).
 
 ## Why
 
@@ -25,7 +25,7 @@ Manual brick counting during truck loading, unloading and conveyor operations is
 | Streamlit shell with system status | Done (M1) |
 | Video validation (type, size, signature, decodability, duration) | Done (M2) |
 | YOLO11 + BoT-SORT frame pipeline with boxes, IDs, line and count overlay | Done (M2) |
-| Trajectory-based line-crossing counting engine | Planned (M3) |
+| Trajectory-based line-crossing counting engine (direction filter, jitter band, duplicate/ID-switch safeguards) | Done (M3) |
 | Video upload, line placement, live counting dashboard | Planned (M4) |
 | Annotated video export and CSV reports | Planned (M5) |
 
@@ -89,6 +89,8 @@ All processing is local. No uploads, cloud storage, analytics or telemetry: Stre
 
 - Counting accuracy depends on the detection model and on tracking quality; no accuracy figure is claimed without a labelled evaluation.
 - Tracking-based counting can miss or double-count when bricks are heavily occluded, overlap, or when the tracker switches IDs as a brick crosses the line.
+- **A fixed camera is required.** The counting line is fixed in the image, so with a handheld or panning camera, stationary bricks move across the image and can be counted.
+- See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md#known-limitations-of-tracking-based-counting) for the full list.
 - CPU processing is considerably slower than real time.
 
 ## Licensing

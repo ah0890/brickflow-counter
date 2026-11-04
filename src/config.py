@@ -71,6 +71,9 @@ class CountingConfig:
     hysteresis_px: float
     min_track_frames: int
     track_timeout_frames: int
+    max_step_ratio: float
+    handover_max_gap_frames: int
+    handover_max_distance: float
     line: LineConfig
 
 
@@ -205,6 +208,9 @@ def parse_config(raw: dict[str, Any], root: Path = PROJECT_ROOT) -> AppConfig:
         hysteresis_px=_number(c, "hysteresis_px", "counting", 0, 200),
         min_track_frames=_number(c, "min_track_frames", "counting", 1, 1000, integer=True),
         track_timeout_frames=_number(c, "track_timeout_frames", "counting", 1, 100000, integer=True),
+        max_step_ratio=_number(c, "max_step_ratio", "counting", 0, 100),
+        handover_max_gap_frames=_number(c, "handover_max_gap_frames", "counting", 0, 1000, integer=True),
+        handover_max_distance=_number(c, "handover_max_distance", "counting", 0, 10),
         line=parse_line(_get(c, "line", "counting")),
     )
 

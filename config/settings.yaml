@@ -32,8 +32,19 @@ counting:
   hysteresis_px: 6
   # Frames a track must exist before it is eligible to be counted.
   min_track_frames: 3
-  # Frames after which a missing track's state is discarded (ID reuse safety).
+  # Frames after which a missing track's state is discarded. Counted IDs are
+  # remembered for the whole job regardless.
   track_timeout_frames: 90
+  # Teleport guard: a move larger than this many box diagonals per frame
+  # (scene cut, identity swap) resets the track's side instead of counting.
+  # 0 disables.
+  max_step_ratio: 1.5
+  # Identity handover: a new track ID appearing within handover_max_distance
+  # box diagonals of a track lost in the last handover_max_gap_frames frames
+  # inherits its state (prevents double counts / misses on ID switches).
+  # Set handover_max_gap_frames to 0 to disable.
+  handover_max_gap_frames: 15
+  handover_max_distance: 0.75
   # Default line, as fractions of frame width/height.
   line:
     x1: 0.10

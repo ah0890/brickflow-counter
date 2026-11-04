@@ -2,6 +2,16 @@
 
 All notable changes to BrickFlow are recorded here, newest first.
 
+## [0.3.0] – 2026-11-04 – Milestone 3: Virtual line and counting engine
+
+### Added
+
+- `src/line_crossing.py`: line geometry with an explicit side convention, signed distance, hysteresis side test, robust segment intersection (collinear/endpoint cases), intersection point, direction helpers.
+- `src/counting.py`: `CountingEngine` implementing the pipeline's `FrameCounter` — confirmed-side tracking with hysteresis, finite-segment crossing test, direction filter, one count per ID per job, pending confirmation after minimum track age, teleport guard, identity handover for tracker ID switches, state pruning, rejection statistics, and `CountEvent` records.
+- Settings `max_step_ratio`, `handover_max_gap_frames`, `handover_max_distance`.
+- 67 new tests: geometry edge cases and all synthetic counting scenarios (single, sequential, near-line jitter, reverse, temporary disappearance, repeated crossing, simultaneous, ID changes, appearing on the line, duplicate frames, track age, segment limits, jumps, vertical/diagonal lines). 148 tests total.
+- Counting algorithm and limitations documented in `docs/ARCHITECTURE.md`.
+
 ## [0.2.0] – 2026-11-04 – Milestone 2: Detection and tracking pipeline
 
 ### Added
