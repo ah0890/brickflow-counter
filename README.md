@@ -2,7 +2,7 @@
 
 Automated brick counting system using YOLO11 object detection, BoT-SORT multi-object tracking, and virtual line-crossing detection to count bricks in videos, generate annotated footage, and maintain digital counting records.
 
-> **Status:** Milestones 1–5 of 6 complete (foundation; detection + tracking pipeline; counting engine; Streamlit interface; exports). Final testing and hardening are in progress — see [CHANGELOG.md](CHANGELOG.md) and [context.md](context.md).
+> **Status:** All six milestones complete (v1.0.0). The pipeline, counting engine, UI and exports are tested. **No brick model is included**: train one with [docs/TRAINING.md](docs/TRAINING.md). See [CHANGELOG.md](CHANGELOG.md).
 
 ## Why
 
@@ -58,6 +58,8 @@ BrickFlow **does not ship a brick detection model**. A generic pretrained YOLO m
 2. Copy the weights file (`.pt` or `.onnx`) into `models/`.
 3. Set `model.weights` in [config/settings.yaml](config/settings.yaml) (default `models/brick_yolo11n.pt`).
 
+No model yet? [docs/TRAINING.md](docs/TRAINING.md) covers frame extraction (`scripts/extract_frames.py`), labelling, training and measuring counting accuracy.
+
 Only load weights from sources you trust — `.pt` files can execute code when loaded. Without weights, the app starts and shows a "Model weights required" notice.
 
 ## Run
@@ -100,9 +102,13 @@ Each run creates `outputs/<job_id>/`:
 
 Invalid values are rejected at startup with a message naming the setting.
 
+## Performance
+
+Measured on a CPU-only Windows laptop (PyTorch CPU build), 716×1274 video, YOLO11n at 640 px: **5–10 fps** processing, i.e. about 3–6× slower than real time for 30 fps footage. Decoding and annotation alone run at ~150 fps, so detection dominates. To speed it up: use a CUDA GPU, lower `model.imgsz` (e.g. 480), or use a trimmed clip.
+
 ## Privacy
 
-All processing is local. No uploads, cloud storage, analytics or telemetry: Streamlit usage stats are disabled and Ultralytics runs with `YOLO_OFFLINE=1` (no analytics, no automatic downloads).
+All processing is local. No uploads, cloud storage, analytics or telemetry: Streamlit usage stats are disabled and Ultralytics runs with `YOLO_OFFLINE=1` (no analytics, no automatic downloads). See [docs/SECURITY.md](docs/SECURITY.md) for the security review.
 
 ## Limitations
 

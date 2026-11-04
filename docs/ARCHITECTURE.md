@@ -54,7 +54,7 @@ Dependency rule: `counting.py` and `line_crossing.py` depend only on the standar
 | CPU PyTorch by default | Dev GPU (GTX 1050, driver 457.49) cannot run current CUDA PyTorch builds. `select_device` verifies CUDA with a test kernel before using it. |
 | Detector behind a Protocol | Ultralytics is AGPL-3.0; allows swapping for a permissively licensed detector without touching counting. |
 | `YOLO_OFFLINE=1` | Disables Ultralytics analytics and silent downloads (local-first requirement). |
-| Weights restricted to `models/` in the UI (planned) | `.pt` files are pickles; limiting selectable locations reduces risk. |
+| Weights restricted to `models/` in the UI | `.pt` files are pickles; limiting selectable locations reduces risk. |
 | Counting line stored as fractions of frame size | Resolution-independent; converted to pixels per video. |
 | Counting direction relative to line orientation | "forward" = movement to the right-hand side of the point1→point2 direction in image coordinates. |
 | ReID disabled in BoT-SORT | Bricks are visually near-identical; appearance features add cost with little identity benefit. |

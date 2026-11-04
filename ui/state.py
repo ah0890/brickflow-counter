@@ -119,6 +119,14 @@ def list_samples(cfg: AppConfig) -> list[Path]:
     return sorted(p for p in d.iterdir() if p.is_file() and p.suffix.lower() in cfg.video.allowed_extensions)
 
 
+_MD_SPECIAL = r"\`*_{}[]()<>#+-.!|~$"
+
+
+def md_escape(text: str) -> str:
+    """Escape Markdown so user-supplied names (e.g. file names) render as plain text."""
+    return "".join("\\" + c if c in _MD_SPECIAL else c for c in str(text))
+
+
 def fmt_duration(seconds: float) -> str:
     seconds = max(seconds, 0)
     m, s = divmod(int(round(seconds)), 60)

@@ -40,7 +40,7 @@ def render(cfg: AppConfig) -> None:
         return
 
     step_label("Step 2 of 4")
-    st.caption(f"Video: **{st.session_state.video_name}** · {info.resolution} · "
+    st.caption(f"Video: **{state.md_escape(st.session_state.video_name)}** · {info.resolution} · "
                f"{state.fmt_duration(info.duration_s)} · {info.fps:.1f} fps")
 
     left, right = st.columns([3, 2], gap="large")

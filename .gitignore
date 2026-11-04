@@ -39,3 +39,6 @@ runs/
 .idea/
 .DS_Store
 Thumbs.db
+
+# Training data
+datasets/

@@ -80,7 +80,7 @@ def _video_selection(cfg: AppConfig) -> None:
 
     info = st.session_state.get("video")
     if info is not None:
-        st.success(f"Selected: **{st.session_state.video_name}**")
+        st.success(f"Selected: **{state.md_escape(st.session_state.video_name)}**")
         key_values([
             ("Duration", state.fmt_duration(info.duration_s) if info.duration_s else "Unknown"),
             ("Resolution", f"{info.resolution} ({info.orientation.lower()})"),

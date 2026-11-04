@@ -2,6 +2,24 @@
 
 All notable changes to BrickFlow are recorded here, newest first.
 
+## [1.0.0] – 2026-11-04 – Milestone 6: Testing, hardening and documentation
+
+### Added
+
+- `scripts/extract_frames.py`: extracts frames into a YOLO dataset skeleton with a **time-based** train/validation split (`data.yaml`, single `brick` class).
+- `docs/TRAINING.md`: footage selection, labelling rules, training, deployment and counting-accuracy measurement.
+- `docs/SECURITY.md`: security and privacy review, dependency audit results, residual risks.
+- README performance section with measured CPU throughput.
+- 7 new tests (187 total).
+
+### Fixed
+
+- User-supplied file names are Markdown-escaped in the UI.
+
+### Security
+
+- `pip-audit -r requirements.txt`: no known vulnerabilities.
+
 ## [0.5.0] – 2026-11-04 – Milestone 5: Exports and reports
 
 ### Added
